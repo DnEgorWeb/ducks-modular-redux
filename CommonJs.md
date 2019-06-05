@@ -34,23 +34,21 @@ reducer.removeWidget = function(widget) {
 module.exports = reducer;
 ```
 
-
-One of the different caveats is that you can't use Redux' `bindActionCreators()` directly with a duck module, as it assumes that when given a function, it's a single action creator, so you need to do something like:
+Есть одна особенность: вы не можете использовать функцию Redux `bindActionCreators()` прямо с модулем duck, так как это предполагает, что функция должна быть одиночной функцией action creator, поэтому вам нужно делать что-то вроде:
 
 ```javascript
 var actionCreators = require('./ducks/widgets');
 bindActionCreators({ ...actionCreators });
 ```
 
-Another is that if you're also exporting some type constants, you need to attach those to the reducer function too, so you can't unpack just the action creators into another object at import time as easily (no `as` syntax) so the above trick isn't as viable.
+Другая особенность заключается в том, что если вы также экспортируете константы типов, вам необходимо также присоединить их к reducer функциям, поэтому вы не можете так просто распаковать только функции action creators в другой объект во время импорта (никакого синтаксиса `as`), поэтому трюк выше не сработает.
 
-You can avoid getting bitten by both of these by rolling your own dispatch binding function - this is the one I'm using to create a function to be passed as the `mapDispatchToProps` argument to `connect()`:
+Вы можете избежать и того, и другого, развернув вашу собственную dispatch binding функцию - это то, что я использую для создания функции для передачи как `mapDispatchToProps` аргумента функции `connect()`:
 
 ```javascript
 /**
- * Creates a function which creates same-named action dispatchers from an object
- * whose function properties are action creators. Any non-functions in the actionCreators
- * object are ignored.
+ * Создает функцию, которая создает аналогично названные action dispatchers из объекта,
+ * чьи свойства функции - это action creators. Любые не-функции в actionCreators игнорируются.
  */
 var createActionDispatchers = actionCreators => dispatch =>
   Object.keys(actionCreators).reduce((actionDispatchers, name) => {
@@ -71,4 +69,4 @@ module.exports = connect(mapStateToProps , mapDispatchToProps)(MyComponent);
 ```
 
 ---
-This document copied almost verbatim from [@insin](https://github.com/insin)'s issue [#2](https://github.com/erikras/ducks-modular-redux/issues/2).
+Этот документ скопирован практичесли дословно из issue [@insin](https://github.com/insin) [#2](https://github.com/erikras/ducks-modular-redux/issues/2).
